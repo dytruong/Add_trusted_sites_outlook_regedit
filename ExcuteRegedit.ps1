@@ -11,7 +11,6 @@ function Save_credential{
     #Check security path to know this file passwd is alive or not
     if (Test-Path $security_path){
         $password = Get-Content "$security_path" | ConvertTo-SecureString
-        $username = $username
     }
     #if file was saved already! Just use it!
     else{
