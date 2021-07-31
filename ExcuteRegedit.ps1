@@ -44,8 +44,9 @@ function Save_credential{
     
 }
 
-$credential = Save_credential -username $username -security_path $security_path
-
+#Execute regedit function.
+#How it works? That will get username and SID in each computer in the computer list. Then creating file reg unique for each computer and running.
+#Is it re-use? Yes, it is. Just change the way to create reg file, it can edit other regedit.
 function Execute_regedit{
     param($computername,$credential)
 
@@ -87,6 +88,8 @@ function Execute_regedit{
                     New-Item -Path $regedit_path -ItemType "file" -Force | Out-Null
                     $line1 = "Windows Registry Editor Version 5.00"
                     Add-Content -Path $regedit_path -Value "$line1`n";
+
+                    #Run loop from 10 to 16 for each outlook version.
                     for ($i=10;$i -le 16;$i++){
                         $l1 = "[HKEY_USERS\"+$sid+"\SOFTWARE\Policies\Microsoft\office\"+$i+".0\outlook\options\mail]"
                         $l2 = '"unblockspecificsenders"=dword:00000001'
@@ -133,4 +136,5 @@ function Execute_regedit{
         }
 }
 
+$credential = Save_credential -username $username -security_path $security_path
 Execute_regedit -computername $computer_list -credential $credential
