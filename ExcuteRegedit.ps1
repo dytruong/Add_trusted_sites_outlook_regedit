@@ -1,10 +1,9 @@
-﻿##################################################################################################
-
+﻿#############################################################
 $computer_list = Import-Csv -Path "C:\computerList.csv" -Header computer     
 $username = "truong_tranduy"    
 $security_path = "C:\Windows\Temp\passwd.txt"
 
-##################################################################################################
+#############################################################
 #Credential handling
 function Save_credential{
     param($username, $security_path)
