@@ -1,6 +1,5 @@
 ﻿##################################################################################################
 
-$host_computer = $env:COMPUTERNAME
 $computer_list = Import-Csv -Path "C:\computerList.csv" -Header computer
 $password = "123456?Ab" | ConvertTo-SecureString -asPlainText -Force;       
 $username = "gameloft\truong_tranduy"                                              
@@ -9,7 +8,7 @@ $credential = New-object System.Management.Automation.PSCredential($username,$pa
 ##################################################################################################
 
 function Execute_regedit{
-    param($computername,$host_computer,$credential)
+    param($computername,$credential)
 
     foreach ($pc in $computername) {
         
@@ -34,7 +33,7 @@ function Execute_regedit{
             #Create errormachine to create log after run completely.
 
             $script_block = {
-                param($host_computer, $credential)
+                param($credential)
             
                 #Get username from group administrators
                 $get_localmember = Get-LocalGroupMember Administrators | Where-Object {$_.ObjectClass -eq "User"} | Where-Object {$_.PrincipalSource -eq "ActiveDirectory"};
@@ -43,7 +42,9 @@ function Execute_regedit{
                 #Check username in group administrators
                 #if there are more 2 users in group administrators, they will return error
                 if ($username.count -gt 1){
-                    $Host.UI.WriteErrorLine("Error: Cannot identify user on this machine ${env:Computername} `nReason: There are more than 2 users in the group administrator")
+                    Write-Host "`n############################################`n"
+                    $Host.UI.WriteErrorLine("Error: Cannot identify user on this machine ${env:Computername} `nReason: There are more than 2 users in the group administrator`n$username")
+                    Write-Host "`n############################################`n"
                     break
                 }
                     
@@ -54,7 +55,7 @@ function Execute_regedit{
 
                 #Create file reg
                 $regedit_path = "C:\safe_sender.reg"
-                New-Item -Path $regedit_path -ItemType "file" -Force;
+                New-Item -Path $regedit_path -ItemType "file" -Force | Out-Null
                 $line1 = "Windows Registry Editor Version 5.00"
                 Add-Content -Path $regedit_path -Value "$line1`n";
                 for ($i=10;$i -le 16;$i++){
@@ -85,7 +86,8 @@ function Execute_regedit{
                 #Check file reg
                 $test_reg = Test-Path -Path "$regedit_path"
                 if ($test_reg){
-                    reg import "$regedit_path"
+                    reg import "$regedit_path" | Out-Null
+                    Write-Host "Import regedit successfully in $env:Computername" -ForegroundColor Green
                     Remove-Item -Path "$regedit_path" -Force
                 }
 
@@ -104,4 +106,4 @@ function Execute_regedit{
         }
 }
 
-Execute_regedit -computername $computer_list -host_computer $host_computer -credential $credential
+Execute_regedit -computername $computer_list -credential $credential
