@@ -31,13 +31,22 @@ function Execute_regedit{
                 "
             }
 
+            #Create errormachine to create log after run completely.
+
             $script_block = {
                 param($host_computer, $credential)
             
                 #Get username from group administrators
                 $get_localmember = Get-LocalGroupMember Administrators | Where-Object {$_.ObjectClass -eq "User"} | Where-Object {$_.PrincipalSource -eq "ActiveDirectory"};
                 $username = $get_localmember.Name;
-
+                
+                #Check username in group administrators
+                #if there are more 2 users in group administrators, they will return error
+                if ($username.count -gt 1){
+                    $Host.UI.WriteErrorLine("Error: Cannot identify user on this machine ${env:Computername} `nReason: There are more than 2 users in the group administrator")
+                    break
+                }
+                    
                 #Convert Username into SID
                 $user = New-Object System.Security.Principal.NTAccount($username)
                 $sid_temp = $user.Translate([System.Security.Principal.SecurityIdentifier])
@@ -83,7 +92,7 @@ function Execute_regedit{
             }
 
             #Execute the command in remote machine.
-            Invoke-Command -Session $new_session -ScriptBlock $script_block -ArgumentList $credential -ErrorAction SilentlyContinue
+            Invoke-Command -Session $new_session -ScriptBlock $script_block -ArgumentList $credential
 
             #Close the connection to release the resource that PSSession was using.
             Remove-PSSession -Session $new_session
