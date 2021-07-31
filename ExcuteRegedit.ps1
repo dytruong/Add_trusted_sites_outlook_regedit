@@ -24,14 +24,11 @@ function Execute_regedit{
             }
             catch
             {
-                throw "Please check:
-                    1. The username or password is incorrect!
-                    2. Computer name $pc lack header computer
-                "
+                Write-Host "Please check:`n1. The username or password is incorrect!`n2. The computer is invalid" -ForegroundColor Red
+                break   
             }
 
-            #Create errormachine to create log after run completely.
-
+            #Create script block 
             $script_block = {
                 param($credential)
             
@@ -43,7 +40,7 @@ function Execute_regedit{
                 #if there are more 2 users in group administrators, they will return error
                 if ($username.count -gt 1){
                     Write-Host "`n############################################`n"
-                    $Host.UI.WriteErrorLine("Error: Cannot identify user on this machine ${env:Computername} `nReason: There are more than 2 users in the group administrator`n$username")
+                    write-host "Error: Cannot identify user on this machine ${env:Computername} `nReason: There are more than 2 users in the group administrator`n$username" -ForegroundColor Red
                     Write-Host "`n############################################`n"
                     break
                 }
