@@ -1,11 +1,52 @@
 ﻿##################################################################################################
 
-$computer_list = Import-Csv -Path "C:\computerList.csv" -Header computer
-$password = "123456?Ab" | ConvertTo-SecureString -asPlainText -Force;       
-$username = "gameloft\truong_tranduy"                                              
-$credential = New-object System.Management.Automation.PSCredential($username,$password)
+$computer_list = Import-Csv -Path "C:\computerList.csv" -Header computer     
+$username = "truong_tranduy"    
+$security_path = "C:\Windows\Temp\passwd.txt"
 
 ##################################################################################################
+#Credential handling
+function Save_credential{
+    param($username, $security_path)
+
+    #Check security path to know this file passwd is alive or not
+    if (Test-Path $security_path){
+        $password = Get-Content "$security_path" | ConvertTo-SecureString
+        $username = $username
+    }
+    #if file was saved already! Just use it!
+    else{
+        (get-credential $username).password | ConvertFrom-SecureString | set-content "$security_path"
+        $password = Get-Content "$security_path" | ConvertTo-SecureString
+    }
+    
+    #get credential
+    $credential = New-Object System.Management.Automation.PsCredential($username, $password)
+    
+    #test credential
+    $username = $credential.username
+    $password = $credential.GetNetworkCredential().password
+    
+    # Get current domain using logged-on user's credentials
+    $CurrentDomain = "LDAP://" + ([ADSI]"").distinguishedName
+    $domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
+    
+    if ($domain.name -eq $null)
+    {
+        write-host "Authentication failed - please verify your username and password." -ForegroundColor Red
+        Remove-Item -Path $security_path -Force
+        $password = $null
+        exit #terminate the script.
+    }
+    else
+    {
+        write-host "Successfully authenticated!" -ForegroundColor Green
+        return $credential
+    }
+    
+}
+
+$credential = Save_credential -username $username -security_path $security_path
 
 function Execute_regedit{
     param($computername,$credential)
