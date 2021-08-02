@@ -60,11 +60,11 @@ function Execute_regedit{
             #Check the username and password before running.
             try 
             {
-                $new_session = New-PSSession -ComputerName $pc.computer -Credential $credential -ErrorAction Stop
+                $new_session = New-PSSession -ComputerName $pc.computer -Credential $credential -ErrorAction stop
             }
             catch
             {
-                Write-Host "Please check:`n1. The username or password is incorrect!`n2. The computer is invalid" -ForegroundColor Red
+                Write-Host "Please check WinRM service in $pc.computer`nTry running command: winrm quickconfig and try again!" -ForegroundColor Red
                 break   
             }
 
