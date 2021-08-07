@@ -60,7 +60,7 @@ function Execute_regedit{
             #Check the username and password before running.
             try 
             {
-                $new_session = New-PSSession -ComputerName $pc.computer -Credential $credential -ErrorAction stop
+                $new_session = New-PSSession -ComputerName $pc.computer -Credential $credential -ErrorAction Continue
             }
             catch
             {
