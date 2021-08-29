@@ -1,7 +1,7 @@
 ﻿#############################################################
-$computer_list = Import-Csv -Path "C:\computerList.csv" -Header computer     
-$username = "truong_tranduy"    
-$security_path = "C:\Windows\Temp\passwd.txt"
+$computer_list = Import-Csv -Path "C:\computerList.csv" -Header computer #place list computer name
+$username = "truong_tranduy"   #user domain admin 
+$security_path = "C:\Windows\Temp\passwd.txt"  #password saved location
 
 #############################################################
 #Credential handling
@@ -82,13 +82,15 @@ function Execute_regedit{
                     $user = New-Object System.Security.Principal.NTAccount($usr)
                     $sid_temp = $user.Translate([System.Security.Principal.SecurityIdentifier])
                     $sid = $sid_temp.Value
-
+                    
                     #Create file reg
                     $regedit_path = "C:\safe_sender.reg"
                     New-Item -Path $regedit_path -ItemType "file" -Force | Out-Null
                     $line1 = "Windows Registry Editor Version 5.00"
                     Add-Content -Path $regedit_path -Value "$line1`n";
-
+                    
+                    ######################################################################################################
+                    #below is the content of regedit file, let's customize your way
                     #Run loop from 10 to 16 for each outlook version.
                     for ($i=10;$i -le 16;$i++){
                         $l1 = "[HKEY_USERS\"+$sid+"\SOFTWARE\Policies\Microsoft\office\"+$i+".0\outlook\options\mail]"
@@ -112,6 +114,7 @@ function Execute_regedit{
                     $line13='"https"=dword:00000001'
                     Add-Content -Path $regedit_path -Value "$line3`n$line4`n$line5`n`n$line7`n$line8`n$line9`n`n$line11`n$line12`n$line13";
                     
+                    #########################################################################################################
                     #Check file reg
                     $test_reg = Test-Path -Path "$regedit_path"
                     if ($test_reg){
