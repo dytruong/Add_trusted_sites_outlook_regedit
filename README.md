@@ -1,13 +1,13 @@
 #author: dytruong
 1. How it works?
-- This script uses to change the regedit file in client windows 10 in the domain controller environment.
+- This script uses to add trusted sites to outlook by editing regedit in mutiple windows 10 in the domain controller environment.
 
 2. Requires:
 - Windows 10 pro (version 1803 or higher)
 - Domain controller environment
 - WinRM enables already.
 - User domain admin with full administrator right in the client computer.
-- File excel contains all computer names in the same column. (csv file)
+- File excel contains all computer names in the same column. (csv extension)
 
 4. How to use it?
 - First one, you have to create the excel file with the same "C:\computerList.csv" or you can create another one but have to change it in script.
